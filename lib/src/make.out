@@ -1,0 +1,3 @@
+mpicc -std=c99 -Wall -Wno-unused-variable -O0 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -c twop_contract.c -I../../include/
+virtual memory exhausted: Cannot allocate memory
+make: *** [twop_contract.o] Error 1

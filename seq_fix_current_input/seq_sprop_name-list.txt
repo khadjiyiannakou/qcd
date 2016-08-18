@@ -1,0 +1,12 @@
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00000.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00001.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00002.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00003.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00004.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00005.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00006.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00007.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00008.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00009.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00010.inverted
+/home/krikitos/Desktop/QCD/qcd_jugene_new/seq_fix_current_input/seq_prop/seq_propagator_strange.0100.00011.inverted

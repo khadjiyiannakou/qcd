@@ -1,0 +1,12 @@
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00000.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00001.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00002.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00003.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00004.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00005.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00006.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00007.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00008.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00009.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00010.inverted
+/homea/pra049/pra04904/work/sources/0100/source_d_t85_x24_y41_z38.0100.00011.inverted

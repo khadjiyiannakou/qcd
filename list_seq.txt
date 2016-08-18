@@ -1,0 +1,12 @@
+seq_src_type1_uu.1000.00000
+seq_src_type1_uu.1000.00001
+seq_src_type1_uu.1000.00002
+seq_src_type1_uu.1000.00003
+seq_src_type1_uu.1000.00004
+seq_src_type1_uu.1000.00005
+seq_src_type1_uu.1000.00006
+seq_src_type1_uu.1000.00007
+seq_src_type1_uu.1000.00008
+seq_src_type1_uu.1000.00009
+seq_src_type1_uu.1000.00010
+seq_src_type1_uu.1000.00011

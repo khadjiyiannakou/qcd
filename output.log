@@ -1,0 +1,27 @@
+workdir: /lustre/jhome11/ecy00/ecy005/krikitos/qcd
+running on 8 cpus ...
+Thu Oct 20 21:06:05 CEST 2011
+opening input file disStrange_mpi_g5_4.ini
+ Local lattice: 64 x 16 x 16 x 16
+Got sink time slices: 0 ... 63
+Got source coords: 0 0 0 0
+Got list_sol file name: /lustre/jhome11/ecy00/ecy005/krikitos/qcd/sol_list.txt
+Got conf name: /lustre/jwork/ecy00/ecy005/krikitos/tm_disconnected_loops/confs/conf.0200
+Got output file name: prop.dat
+ Got alpha_gauss: 4.000000
+ Got nsmear_gauss: 0
+ Got alpha_APE: 0.500000
+ Got nsmear_APE: 0
+Got mu_value: 0.003500
+Got gamma matrix index: 4
+Got number of noise vector: 1
+Got output loop file name: /lustre/jhome11/ecy00/ecy005/krikitos/qcd/loop_g5g4.dat
+Got momenta-list file name: momentalist_0_16
+will read 257 momenta combinations
+momenta list read and broadcasted
+gauge-field loaded
+plaquette = 5.852578e-01
+memory for propagators and gauge-field allocated
+got precision: 32
+cleaning up...
+Thu Oct 20 21:06:14 CEST 2011

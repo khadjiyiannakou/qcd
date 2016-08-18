@@ -1,0 +1,12 @@
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00000
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00001
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00002
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00003
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00004
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00005
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00006
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00007
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00008
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00009
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00010
+/home/khadjiyiannakou/test_tmLQCD/seq_src_type1_dd.1000.00011
