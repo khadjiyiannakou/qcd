@@ -203,6 +203,7 @@ int main(int argc,char* argv[])
    FILE *fp_vfun_v_WL;
    FILE *fp_vfun_a_WL;
    FILE *fp_vfun_t_WL;
+   FILE *fp_vfun_s_WL;
 
    FILE *fp_pprop;      
   
@@ -223,6 +224,7 @@ int main(int argc,char* argv[])
    char vfun_v_WL_name[qcd_MAX_STRING_LENGTH];
    char vfun_a_WL_name[qcd_MAX_STRING_LENGTH];
    char vfun_t_WL_name[qcd_MAX_STRING_LENGTH];
+   char vfun_s_WL_name[qcd_MAX_STRING_LENGTH];
 
    char pprop_name[qcd_MAX_STRING_LENGTH];      // name of output file, momentum propagator
    
@@ -258,6 +260,7 @@ int main(int argc,char* argv[])
 
    qcd_complex_16 (*vfun_v_WL)[4][4][3][3];
    qcd_complex_16 (*vfun_a_WL)[4][4][3][3];
+   qcd_complex_16 (*vfun_s_WL)[4][4][3][3];
    qcd_complex_16 (*vfun_t_WL)[4][4][3][3];
    qcd_complex_16 (*vfun_tmp_WL)[4][4][3][3]; // temporal space for global reduction
 
@@ -346,6 +349,9 @@ int main(int argc,char* argv[])
    strcpy(vfun_v_WL_name,qcd_getParam("<vertex_function_v_WL_name>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",vfun_v_WL_name);
 
+   strcpy(vfun_s_WL_name,qcd_getParam("<vertex_function_s_WL_name>",params,params_len));
+   if(myid==0) printf("Got output file name: %s\n",vfun_s_WL_name);
+
    strcpy(vfun_a_WL_name,qcd_getParam("<vertex_function_a_WL_name>",params,params_len));
    if(myid==0) printf("Got output file name: %s\n",vfun_a_WL_name);
 
@@ -408,7 +414,9 @@ int main(int argc,char* argv[])
    // load gauge-field
    if(qcd_getGaugeField(gauge_name,qcd_GF_LIME,&u)) exit(EXIT_FAILURE);
    if(myid==0) printf("gauge-field loaded\n");   
-   
+   if(myid==0) printf("gauge-field loaded\n");   
+   double plaq = qcd_calculatePlaquette(&u);
+   if(myid==0) printf("plaquette = %e\n",plaq);   
    qcd_communicateGaugePM(&u);
    
    // load propagator
@@ -422,11 +430,13 @@ int main(int argc,char* argv[])
    // allocate memory
    j=0;
    vfun_v_WL = malloc(2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
+   vfun_s_WL = malloc(2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
    vfun_a_WL = malloc(2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
    vfun_t_WL = malloc(2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
    vfun_tmp_WL = malloc(2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
    lxr = malloc(2*Wl_fwd.Nz*sizeof(qcd_complex_16));
    if(vfun_v_WL == NULL)j++;
+   if(vfun_s_WL == NULL)j++;
    if(vfun_a_WL == NULL)j++;
    if(vfun_t_WL == NULL)j++;
    if(lxr == NULL)j++;
@@ -523,6 +533,7 @@ int main(int argc,char* argv[])
    {
       j=0;
       if( (fp_vfun_v_WL=fopen(vfun_v_WL_name,"w"))==NULL) j++;
+      if( (fp_vfun_s_WL=fopen(vfun_s_WL_name,"w"))==NULL) j++;
       if( (fp_vfun_a_WL=fopen(vfun_a_WL_name,"w"))==NULL) j++;
       if( (fp_vfun_t_WL=fopen(vfun_t_WL_name,"w"))==NULL) j++;
       if( (fp_pprop=fopen(pprop_name,"w"))==NULL) j++;
@@ -552,6 +563,7 @@ int main(int argc,char* argv[])
 
    //================ create vertex functions ==================//
    memset(&(vfun_v_WL[0][0][0][0][0].re),0,2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
+   memset(&(vfun_s_WL[0][0][0][0][0].re),0,2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
    memset(&(vfun_a_WL[0][0][0][0][0].re),0,2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
    memset(&(vfun_t_WL[0][0][0][0][0].re),0,2*Wl_fwd.Nz*4*4*3*3*sizeof(qcd_complex_16));
    int Nz = Wl_fwd.Nz;
@@ -602,6 +614,13 @@ int main(int argc,char* argv[])
 							       qcd_CMUL(Wl_bwd.D[i*Nz+iz][ic2][ic3],rprop.D[pointMinus][id3][id4][ic3][ic4])));
 
 				 }
+			     //============= Scalar ==============//
+			     if(qcd_NORM(qcd_ONE[id2][id3])>1e-4){
+			       vfun_s_WL[iz][id1][id4][ic1][ic4] = qcd_CADD(vfun_s_WL[iz][id1][id4][ic1][ic4],
+									    qcd_CMUL(lxr[iz],qcd_ONE[id2][id3]));
+			       vfun_s_WL[Nz+iz][id1][id4][ic1][ic4] = qcd_CADD(vfun_s_WL[Nz+iz][id1][id4][ic1][ic4],
+									    qcd_CMUL(lxr[Nz+iz],qcd_ONE[id2][id3]));
+			     }
 			     //============= Vector ==============//
 			     if(qcd_NORM(qcd_GAMMA[dirLine][id2][id3])>1e-4){
 			       vfun_v_WL[iz][id1][id4][ic1][ic4] = qcd_CADD(vfun_v_WL[iz][id1][id4][ic1][ic4],
@@ -651,6 +670,18 @@ int main(int argc,char* argv[])
    for(ic1=0; ic1<3; ic1++)
    for(ic4=0; ic4<3; ic4++)
      fprintf(fp_vfun_v_WL,"%i \t %i %i %i %i \t %+e %+e %+e %+e\n",iz,id1,id4,ic1,ic4,
+	      vfun_tmp_WL[Nz+iz][id1][id4][ic1][ic4].re/geo.V,vfun_tmp_WL[Nz+iz][id1][id4][ic1][ic4].im/geo.V,
+	      vfun_tmp_WL[iz][id1][id4][ic1][ic4].re/geo.V,vfun_tmp_WL[iz][id1][id4][ic1][ic4].im/geo.V);
+
+   //============ print scalar ==========//
+   MPI_Reduce(&(vfun_s_WL[0][0][0][0][0].re), &(vfun_tmp_WL[0][0][0][0][0].re), 2*Nz*4*4*3*3*2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+   if(myid==0)
+   for(int iz = 0 ; iz < Nz; iz++)  
+   for(id1=0; id1<4; id1++)
+   for(id4=0; id4<4; id4++)
+   for(ic1=0; ic1<3; ic1++)
+   for(ic4=0; ic4<3; ic4++)
+     fprintf(fp_vfun_s_WL,"%i \t %i %i %i %i \t %+e %+e %+e %+e\n",iz,id1,id4,ic1,ic4,
 	      vfun_tmp_WL[Nz+iz][id1][id4][ic1][ic4].re/geo.V,vfun_tmp_WL[Nz+iz][id1][id4][ic1][ic4].im/geo.V,
 	      vfun_tmp_WL[iz][id1][id4][ic1][ic4].re/geo.V,vfun_tmp_WL[iz][id1][id4][ic1][ic4].im/geo.V);
 
