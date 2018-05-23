@@ -10,5 +10,5 @@
 
 /* prototypes */
 qcd_real_8 qcd_calculatePlaquette(qcd_gaugeField *u);
-
+void qcd_calculateGluonLoops(qcd_gaugeField *u, qcd_real_8* gLoops);
 #endif
