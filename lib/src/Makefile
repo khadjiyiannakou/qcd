@@ -1,4 +1,4 @@
-CC=mpicc -std=gnu99 -Wall -Wno-unused-variable -O2 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+CC=mpicc -std=gnu99 -Wall -Wno-unused-variable -O3 -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
 
 AR=ar
 

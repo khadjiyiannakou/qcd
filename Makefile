@@ -1,7 +1,7 @@
 CC=mpicc
 
-CFLAGS=-I./include -std=gnu99
-LDFLAGS=-L./lib -L/usr/local/lib -L/homec/ecy00/ecy011/qcd_kyriakos/lime-1.3.2/lib -L/homec/ecy00/ecy011/qcd_kyriakos/gsl-1.15/lib
+CFLAGS=-I./include -std=gnu99 -O3
+LDFLAGS=-L./lib -L/usr/local/lib -L/home/tuj57552/install/lib/
 LIBS=-lqcd -lgsl -llime -lgslcblas -lm
 
 .PHONY: clean\
@@ -28,7 +28,8 @@ TARGETS=b_minus_Dx\
 	sourceExp_new_format\
 	zfac\
 	zfac_disc_w_der\
-	zfac_PDFs
+	zfac_PDFs\
+	gluonLoops
 #	unit_gaugefield\
 #	zfac\
 #	show_conf\
