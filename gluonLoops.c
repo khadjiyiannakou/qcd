@@ -15,12 +15,16 @@
 int main(int argc,char* argv[])
 {
    FILE*  pfile;
+   FILE *fp_momlist;
    char*  params = NULL;
    char   gauge_name[qcd_MAX_STRING_LENGTH];
    char   param_name[qcd_MAX_STRING_LENGTH];
    char   output_name[qcd_MAX_STRING_LENGTH];
+   char momlist_name[qcd_MAX_STRING_LENGTH];
 
-   qcd_int_4   i,nsmearstout;
+   qcd_int_4   i,k,j,nsmearstout;
+   qcd_int_4 printStep;
+   qcd_int_4 Nprint;
    qcd_real_8   plaq,rho;
    int   params_len;   
 
@@ -35,6 +39,9 @@ int main(int argc,char* argv[])
    int myid,numprocs, namelen;    
    char processor_name[MPI_MAX_PROCESSOR_NAME];
 
+   qcd_int_4 (*mom)[3];                         // momenta-list
+   int Nmom;
+   
 
    //set up MPI
    MPI_Init(&argc, &argv);
@@ -78,27 +85,63 @@ int main(int argc,char* argv[])
    if(myid==0) printf(" Got rho_stout: %lf\n",rho);
    sscanf(qcd_getParam("<nstout>",params,params_len),"%d",&nsmearstout);
    if(myid==0) printf(" Got nstout: %d\n",nsmearstout);   
+
+   sscanf(qcd_getParam("<printStep>",params,params_len),"%d",&printStep);
+   if(myid==0) printf(" Got printStep: %d\n",printStep);
+
+   if( (nsmearstout%printStep) != 0){
+     fprintf(stderr,"Error! printStep should divide the number of smearing steps");
+     exit(EXIT_FAILURE);
+   }
+   Nprint = nsmearstout/printStep + 1; // +1 because we want also the unsmeared case
+
    strcpy(gauge_name,qcd_getParam("<cfg_name>",params,params_len));
    if(myid==0) printf(" Got conf name: %s\n",gauge_name);
 
    strcpy(output_name,qcd_getParam("<output_name>",params,params_len));
    if(myid==0) printf(" Got output name: %s\n",output_name);
 
+   strcpy(momlist_name,qcd_getParam("<momenta_list>",params,params_len));
+   if(myid==0) printf("Got momenta-list file name: %s\n",momlist_name);
+
    if(myid==0)
    {
       pfile = fopen(output_name,"w");   
       if(pfile == NULL)
-      {
-         printf("failed to open %s for writing\n",output_name);
-         i=1;
-      }
+	{
+	  printf("failed to open %s for writing\n",output_name);
+	  k=1;
+	}
+      fp_momlist = fopen(momlist_name,"r");
+      if(fp_momlist==NULL)
+	{
+	  printf("failed to open %s for reading\n",momlist_name);
+	  k=1;
+	}
    }
-   MPI_Bcast(&i,1,MPI_INT, 0, MPI_COMM_WORLD);
-   if(i==1) exit(EXIT_FAILURE);
-  
-
+   MPI_Bcast(&k,1,MPI_INT, 0, MPI_COMM_WORLD);
+   if(k==1) exit(EXIT_FAILURE);
 
    free(params);      
+
+   //load momenta-list   
+   if(myid==0) fscanf(fp_momlist,"%d\n",&Nmom);
+   MPI_Bcast(&Nmom,1,MPI_INT, 0, MPI_COMM_WORLD);
+   if(myid==0) printf("will read %d momenta combinations\n",Nmom);
+
+   mom = malloc(Nmom*3*sizeof(qcd_int_4));
+
+   if(myid==0)
+   {
+      for(j=0; j<Nmom; j++)
+      {
+         fscanf(fp_momlist,"%i %i %i\n",&(mom[j][0]),&(mom[j][1]),&(mom[j][2]));
+      }
+      fclose(fp_momlist);   
+   }
+   MPI_Bcast(&(mom[0][0]),Nmom*3,MPI_INT,0, MPI_COMM_WORLD);
+   if(myid==0) printf("momenta list read and broadcasted\n");   
+
    ///////////////////////////////////////////////////////////////////////////////////////////////////
 
    if(P[0] != 1)
@@ -124,23 +167,32 @@ int main(int argc,char* argv[])
    plaq = qcd_calculatePlaquette(&u);
    if(myid==0) printf("plaquette not smeared= %e\n",plaq);
 
+   qcd_complex_16 *gLoops = malloc(Nprint*geo.lL[0]*Nmom*2*sizeof(double));
+   qcd_calculateGluonLoops(&u,gLoops,mom,Nmom); // gluon loops without any smearing
    qcd_copyGaugeField(&utmp,&u);
-   /** test >=0 stout smearing **/
+
+   int ii=0;
    for(i=0; i<nsmearstout; i++)
      {
        qcd_stoutsmearing(&u_out, &utmp, rho, 4);
        plaq=qcd_calculatePlaquette(&u_out);
        if(myid==0) printf("iter=%d, plaquette stout=%e\n",i,plaq);
        qcd_copyGaugeField(&utmp,&u_out);
+       if((i+1)%printStep == 0){
+	 ii+=1;
+	 qcd_calculateGluonLoops(&u_out,&(gLoops[ii*geo.lL[0]*Nmom]),mom,Nmom);
+       }
      }   
    
-   double *gLoops = malloc(geo.lL[0]*sizeof(double));
-   qcd_calculateGluonLoops(&u_out,gLoops);
-   for(int it =0 ; it < geo.lL[0] ; it++)
-     if(myid==0)
-       fprintf(pfile,"%d %+e\n",it,gLoops[it]);
+   for(int st = 0 ; st < Nprint ; st++)
+     for(int it =0 ; it < geo.lL[0] ; it++)
+       for(int imom = 0 ; imom < Nmom ; imom++)
+	 if(myid==0)
+	   fprintf(pfile,"%d %d %+d %+d %+d %+e %+e\n",st*printStep,it,mom[imom][0],mom[imom][1],mom[imom][2],
+		   gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].re, gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].im);
 
    free(gLoops);
+   free(mom);
    qcd_destroyGaugeField(&utmp); 
    qcd_destroyGaugeField(&u_out); 
    qcd_destroyGaugeField(&u); 
