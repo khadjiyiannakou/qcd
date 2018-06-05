@@ -1,8 +1,5 @@
-/* test the stout smearing
-**
- *  * APE-smeared gauge fields
- *
- * Tomasz Korzec 2009
+/*
+  Kyriakos Hadjiyiannakou 2018
  ****************************************/
  
 #include <stdio.h>
