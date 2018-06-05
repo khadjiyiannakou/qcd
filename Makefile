@@ -29,7 +29,8 @@ TARGETS=b_minus_Dx\
 	zfac\
 	zfac_disc_w_der\
 	zfac_PDFs\
-	gluonLoops
+	gluonLoops\
+	tuneStout
 #	unit_gaugefield\
 #	zfac\
 #	show_conf\
