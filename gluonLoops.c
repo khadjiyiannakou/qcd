@@ -18,6 +18,7 @@ int main(int argc,char* argv[])
    char   param_name[qcd_MAX_STRING_LENGTH];
    char   output_name[qcd_MAX_STRING_LENGTH];
    char momlist_name[qcd_MAX_STRING_LENGTH];
+   char sumT[qcd_MAX_STRING_LENGTH]; // if this string is yes then it sums the time slices
 
    qcd_int_4   i,k,j,nsmearstout;
    qcd_int_4 printStep;
@@ -101,6 +102,9 @@ int main(int argc,char* argv[])
    strcpy(momlist_name,qcd_getParam("<momenta_list>",params,params_len));
    if(myid==0) printf("Got momenta-list file name: %s\n",momlist_name);
 
+   strcpy(sumT,qcd_getParam("<sumT>",params,params_len));
+   if(myid==0) printf("Do you want to perform the sum over time-slices?: %s\n",sumT);
+
    if(myid==0)
    {
       pfile = fopen(output_name,"w");   
@@ -180,13 +184,31 @@ int main(int argc,char* argv[])
 	 qcd_calculateGluonLoops(&u_out,&(gLoops[ii*geo.lL[0]*Nmom]),mom,Nmom);
        }
      }   
-   
-   for(int st = 0 ; st < Nprint ; st++)
-     for(int it =0 ; it < geo.lL[0] ; it++)
-       for(int imom = 0 ; imom < Nmom ; imom++)
-	 if(myid==0)
-	   fprintf(pfile,"%d %d %+d %+d %+d %+e %+e\n",st*printStep,it,mom[imom][0],mom[imom][1],mom[imom][2],
-		   gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].re, gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].im);
+
+   qcd_complex_16  sumLoop;
+
+   if( strcmp(sumT,"yes") == 0  || strcmp(sumT,"YES") == 0){
+     if(myid == 0) printf("You have enable sum of the loops on time");
+     for(int st = 0 ; st < Nprint ; st++)
+       for(int imom = 0 ; imom < Nmom ; imom++){
+	 sumLoop.re=0.; sumLoop.im=0.;
+	 if(myid==0){
+	   for(int it =0 ; it < geo.lL[0] ; it++){
+	     sumLoop.re += gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].re;
+	     sumLoop.im += gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].im;
+	   } 
+	   fprintf(pfile,"%d %+d %+d %+d %+e %+e\n",st*printStep,mom[imom][0],mom[imom][1],mom[imom][2],sumLoop.re,sumLoop.im);
+	 }
+       }
+   }
+   else{
+     for(int st = 0 ; st < Nprint ; st++)
+       for(int it =0 ; it < geo.lL[0] ; it++)
+	 for(int imom = 0 ; imom < Nmom ; imom++)
+	   if(myid==0)
+	     fprintf(pfile,"%d %d %+d %+d %+d %+e %+e\n",st*printStep,it,mom[imom][0],mom[imom][1],mom[imom][2],
+		     gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].re, gLoops[st*geo.lL[0]*Nmom + it*Nmom + imom].im);
+   }
 
    free(gLoops);
    free(mom);
