@@ -13,5 +13,5 @@
 
 void qcd_gluonField(qcd_gaugeField *a, qcd_gaugeField *u);
 int qcd_landauGauge(qcd_gaugeField *landauu, qcd_gaugeField *u, qcd_real_8 overparam);
-
+void traceless_gluon_Field(qcd_gaugeField *uTraceless, qcd_gaugeField *u);
 #endif 

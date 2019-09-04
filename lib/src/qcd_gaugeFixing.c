@@ -211,3 +211,27 @@ int qcd_landauGauge(qcd_gaugeField *landauu, qcd_gaugeField *u, qcd_real_8 overp
    qcd_destroyGaugeTransformation(&g);
    return(iter);
 }//end qcd_landauGauge
+
+void traceless_gluon_Field(qcd_gaugeField *uTraceless, qcd_gaugeField *u){
+  for(int lt=0; lt < u->geo->lL[0]; lt++)
+    for(int lx=0;lx<u->geo->lL[1];lx++)
+      for(int ly=0;ly<u->geo->lL[2];ly++)
+	for(int lz=0;lz<u->geo->lL[3];lz++){
+	  int l=qcd_LEXIC(lt,lx,ly,lz,u->geo->lL);
+	  
+	  for(int mu = 0 ; mu < 4 ; mu++){
+	    // compute the trace of the input field
+	    double tmpR= (u->D[l][mu][0][0].re + u->D[l][mu][1][1].re + u->D[l][mu][2][2].re)/3.;
+	    double tmpI= (u->D[l][mu][0][0].im + u->D[l][mu][1][1].im + u->D[l][mu][2][2].im)/3.;
+	    qcd_complex_16 trace = (qcd_complex_16) {tmpR,tmpI};
+	    for(int c1 = 0; c1 < 3 ; c1++)
+	      for(int c2 = 0 ; c2 < 3 ; c2++){
+		if(c1==c2)
+		  uTraceless->D[l][mu][c1][c2] = qcd_CSUB(u->D[l][mu][c1][c2],trace);
+		else
+		  uTraceless->D[l][mu][c1][c2] = u->D[l][mu][c1][c2];
+	      }
+	    
+	  }
+    }
+}
