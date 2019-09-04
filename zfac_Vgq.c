@@ -27,7 +27,6 @@ int main(int argc,char* argv[])
 
    char vfun_name[qcd_MAX_STRING_LENGTH];     
    char param_name[qcd_MAX_STRING_LENGTH];      // name of parameter file
-   char loops_name[qcd_MAX_STRING_LENGTH];
    char pprop_name[qcd_MAX_STRING_LENGTH];
 
    qcd_geometry geo;                            // geometry structure
@@ -88,7 +87,7 @@ int main(int argc,char* argv[])
    if(myid==0) printf(" Local lattice: %i x %i x %i x %i\n",geo.lL[0],geo.lL[1],geo.lL[2],geo.lL[3]);
 
    strcpy(gloops_name,qcd_getParam("<gloops_name>",params,params_len));
-   if(myid==0) printf("Got gluon loop file name: %s\n",loops_name);
+   if(myid==0) printf("Got gluon loop file name: %s\n",gloops_name);
                                  
    strcpy(vfun_name,qcd_getParam("<vfd_name>",params,params_len));
    if(myid==0) printf("Got output file name for vertex function: %s\n",vfun_name);
