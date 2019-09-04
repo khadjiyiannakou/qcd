@@ -32,7 +32,8 @@ TARGETS=b_minus_Dx\
 	gluonLoops\
 	tuneStout \
 	zfac_Vgg \
-	zfac_Vgq
+	zfac_Vgq \
+	zfac_Vqg
 #	unit_gaugefield\
 #	zfac\
 #	show_conf\
