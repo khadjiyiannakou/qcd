@@ -30,9 +30,10 @@ int main(int argc,char* argv[])
    char param_name[qcd_MAX_STRING_LENGTH];      // name of parameter file
    char loops_name[qcd_MAX_STRING_LENGTH];
    char pprop_name[qcd_MAX_STRING_LENGTH];
+   char doTraceless[qcd_MAX_STRING_LENGTH];
 
    qcd_geometry geo;                            // geometry structure
-   qcd_gaugeField u;                            // gauge field 
+   qcd_gaugeField u, utmp;                            // gauge field 
    char gloops_name[qcd_MAX_STRING_LENGTH];
 
    qcd_real_8 theta[4] = {M_PI,0.0,0.0,0.0};    // antiperiodic b.c. in time
@@ -94,7 +95,7 @@ int main(int argc,char* argv[])
    if(myid==0) printf(" Local lattice: %i x %i x %i x %i\n",geo.lL[0],geo.lL[1],geo.lL[2],geo.lL[3]);
 
    strcpy(gloops_name,qcd_getParam("<gloops_name>",params,params_len));
-   if(myid==0) printf("Got gluon loop file name: %s\n",loops_name);
+   if(myid==0) printf("Got gluon loop file name: %s\n",gloops_name);
                                  
    strcpy(vfun_name,qcd_getParam("<vfd_name>",params,params_len));
    if(myid==0) printf("Got output file name for vertex function: %s\n",vfun_name);
@@ -105,11 +106,14 @@ int main(int argc,char* argv[])
    sscanf(qcd_getParam("<momentum>",params,params_len),"%hd %hd %hd %hd",&pn[0], &pn[1], &pn[2], &pn[3]);
    if(myid==0) printf("Got momentum: [(%i+0.5)*2*pi/%i, %i*2*pi/%i, %i*2*pi/%i, %i*2*pi/%i] \n",pn[0],L[0],pn[1],L[1],pn[2],L[2],pn[3],L[3]);
 
-   sscanf(qcd_getParam("<nstout>",params,params_len),"%hd",&nStout);
-   if(myid==0) printf("Got number of stouts including without smearing: %i \n",nStout);
+   sscanf(qcd_getParam("<nstout>",params,params_len),"%d",&nStout);
+   if(myid==0) printf("Got number of stouts including without smearing: %d \n",nStout);
 
    strcpy(gauge_name,qcd_getParam("<cfg_name>",params,params_len));
    if(myid==0) printf("Got conf name: %s\n",gauge_name);
+
+   strcpy(doTraceless,qcd_getParam("<doTraceless>",params,params_len));
+   if(myid==0) printf("Do you want to use traceless in the gluon fields?: %s\n",doTraceless);
 
    px[0]=(pn[0]*2*M_PI+theta[0])/L[0]; 
    px[1]=(pn[1]*2*M_PI+theta[1])/L[1];
@@ -132,6 +136,9 @@ int main(int argc,char* argv[])
   
    j = 0;
    j += qcd_initGaugeField(&u, &geo);
+   if( strcmp(doTraceless,"yes") == 0  || strcmp(doTraceless,"YES") == 0)
+     j += qcd_initGaugeField(&utmp, &geo);
+  
    MPI_Allreduce(&j, &k, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
    if(k>0)
    {
@@ -142,7 +149,17 @@ int main(int argc,char* argv[])
    // load gauge-field
    if(qcd_getGaugeField(gauge_name,qcd_GF_LIME,&u)) exit(EXIT_FAILURE);
    if(myid==0) printf("gauge-field loaded\n");   
-   
+
+   if( strcmp(doTraceless,"yes") == 0  || strcmp(doTraceless,"YES") == 0){
+     traceless_gluon_Field(&utmp,&u);
+     qcd_copyGaugeField(&u,&utmp);
+   }
+
+   qcd_communicateGaugePM(&u);
+   qcd_waitall(&geo);
+   double plaq = qcd_calculatePlaquette(&u);
+   if(myid==0) printf("plaquette not smeared= %e\n",plaq);
+
 
    if(myid==0)
    {
@@ -222,6 +239,7 @@ int main(int argc,char* argv[])
    free(gloops);
    qcd_destroyGeometry(&geo);
    qcd_destroyGaugeField(&u);
+   if( strcmp(doTraceless,"yes") == 0  || strcmp(doTraceless,"YES") == 0) qcd_destroyGaugeField(&utmp);
    MPI_Finalize();
 }//end main 
 
